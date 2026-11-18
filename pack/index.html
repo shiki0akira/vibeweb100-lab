@@ -53,7 +53,7 @@ header b{font-weight:900;font-size:15px;margin-right:auto}
 .center{position:absolute;left:50%;top:50%;width:var(--cw);aspect-ratio:5/7;margin-left:calc(var(--cw) / -2);margin-top:calc(var(--cw) * -.7)}
 
 /* ---------- 卡包 ---------- */
-#packwrap{transition:transform .5s cubic-bezier(.5,0,.9,.4),opacity .45s;z-index:2}
+#packwrap{transition:transform .34s cubic-bezier(.5,0,.9,.4),opacity .3s;z-index:2}
 #packwrap.gone{transform:translateY(130%) rotate(7deg);opacity:0;pointer-events:none}
 #packwrap.drop{animation:drop .55s cubic-bezier(.3,1.4,.5,1) backwards}
 @keyframes drop{0%{transform:translateY(-130%) rotate(-8deg);opacity:0}100%{transform:none;opacity:1}}
@@ -100,7 +100,7 @@ header b{font-weight:900;font-size:15px;margin-right:auto}
 #peel.fly{transition:transform .45s ease-in,opacity .45s;opacity:0}
 
 /* ---------- 卡片 ---------- */
-#stack{transition:transform .42s cubic-bezier(.2,.9,.3,1.15),opacity .15s;z-index:1}
+#stack{transition:transform .3s cubic-bezier(.2,.9,.3,1.15),opacity .15s;z-index:1}
 #stack.in-pack{transform:translateY(4%) scale(.92);opacity:0}
 #stack.peek{transform:translateY(-42%) scale(.92);opacity:1}
 .card{position:absolute;inset:0;transition:transform .2s ease-out;--px:50%;--py:50%}
@@ -343,9 +343,9 @@ function tween(to){const from=S.p,t0=performance.now(),d=to?200:160;(function f(
 function completeTear(){if(S.mode!=='sealed')return;S.mode='opening';S.down=false;packwrap.classList.add('torn');if(!S.force){C.packs++;saveC()}snd.rip();buzz(30);
   peel.classList.add('fly');peel.style.transform=`translate(-30%,-500%) rotate(-75deg)`;
   burst(16,['#a985ea','#6c45b8','#c2a6f2','#ffffff'],.2,.6,true);pack.style.transform='';
-  setTimeout(()=>{stack.className='center peek';snd.slide()},170);
-  setTimeout(()=>{packwrap.classList.add('gone');stack.className='center'},640);
-  setTimeout(()=>{S.mode='cards';onTop()},980)}
+  setTimeout(()=>{stack.className='center peek';snd.slide()},120);
+  setTimeout(()=>{packwrap.classList.add('gone');stack.className='center'},400);
+  setTimeout(()=>{S.mode='cards';onTop()},660)}
 
 function onTop(){const els=[...stack.querySelectorAll('.card')];
   els.forEach(el=>{const k=+el.dataset.i-S.i;el.classList.remove('top','glow-SR','glow-SSR','glow-H','pop','bigpop','drag');el.style.zIndex=10-k;
