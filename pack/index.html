@@ -279,7 +279,8 @@ const LKEY='packLang';let LANG=(()=>{const q=new URLSearchParams(location.search
   try{const v=localStorage.getItem(LKEY);if(v==='en'||v==='zh')return v}catch(e){}
   return /^zh/i.test(navigator.language||'')?'zh':'en'})();
 const t=k=>TEXT[LANG][k],nm=i=>LANG==='en'?NAMES_EN[i]:CATS[i][0];
-function applyLang(){document.documentElement.lang=LANG==='en'?'en':'zh-Hant';document.documentElement.dataset.lang=LANG;document.title=t('title');
+function applyLang(){document.documentElement.lang=LANG==='en'?'en':'zh-Hant';document.documentElement.dataset.lang=LANG;document.title=TEXT.zh.title;// 網頁標題固定中文，GA4 才不會把中英文算成兩個頁面
+
   document.querySelectorAll('[data-t]').forEach(el=>{el.textContent=t(el.dataset.t)});
   $('lang').textContent=t('lang');$('lang').setAttribute('aria-label',t('langAria'));stage.setAttribute('aria-label',t('stageAria'));
   if(!$('debug').hidden)$('toggledebug').textContent=t('hideDebug')}
