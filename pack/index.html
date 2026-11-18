@@ -38,14 +38,16 @@ header b{font-weight:900;font-size:15px;margin-right:auto}
   background:radial-gradient(75% 55% at 50% 46%,#fff 0%,#f1f3f5 100%);border:1px solid var(--line)}
 #stage.shake{animation:shake .4s}
 @keyframes shake{15%{transform:translate(-6px,3px)}35%{transform:translate(6px,-4px)}55%{transform:translate(-4px,4px)}75%{transform:translate(3px,-2px)}}
-#dim{position:absolute;inset:0;background:#0b1220;opacity:0;transition:opacity .35s}
-#stage[data-fx="SR"] #dim{opacity:.55} #stage[data-fx="SSR"] #dim{opacity:.74} #stage[data-fx="H"] #dim{opacity:.86}
+/* 開出稀有卡時的背景：跟卡圖一樣的印刷風格，深色底加網點和顆粒，所以舞台還是會變暗 */
+#dim{position:absolute;inset:0;opacity:0;transition:opacity .35s;
+  background:radial-gradient(circle at 50% 46%,#fff3 0,#fff0 55%),var(--grain),radial-gradient(#ffffff26 1.4px,transparent 2px) 0 0/11px 11px,var(--dimc,#0b1220)}
+#stage[data-fx="SR"] #dim{opacity:.94;--dimc:#2e62c2} #stage[data-fx="SSR"] #dim{opacity:.95;--dimc:#c46a12} #stage[data-fx="H"] #dim{opacity:.96;--dimc:#4b2a92}
 #rays{position:absolute;left:50%;top:50%;width:190%;aspect-ratio:1;margin:-95% 0 0 -95%;opacity:0;transition:opacity .45s;animation:spin 16s linear infinite;
   -webkit-mask:repeating-conic-gradient(#000 0 7deg,transparent 7deg 20deg);mask:repeating-conic-gradient(#000 0 7deg,transparent 7deg 20deg)}
 #rays::before{content:"";position:absolute;inset:0;background:var(--rayc,#fff);-webkit-mask:radial-gradient(circle,#000 8%,transparent 62%);mask:radial-gradient(circle,#000 8%,transparent 62%)}
 @keyframes spin{to{transform:rotate(360deg)}}
 #stage[data-fx="SR"] #rays{opacity:.35;--rayc:#9fd4ff}
-#stage[data-fx="SSR"] #rays{opacity:.7;--rayc:radial-gradient(circle,#fff6cf,#f5b942 45%,#ff8a3d)}
+#stage[data-fx="SSR"] #rays{opacity:.6;--rayc:radial-gradient(circle,#fff6cf,#f7d33c 50%,#ffb02e)}
 #stage[data-fx="H"] #rays{opacity:.85;--rayc:conic-gradient(#ff5a4d,#f5b942,#7dffb0,#63b8ff,#d58bff,#ff5a4d);animation-duration:9s}
 
 .center{position:absolute;left:50%;top:50%;width:var(--cw);aspect-ratio:5/7;margin-left:calc(var(--cw) / -2);margin-top:calc(var(--cw) * -.7)}
@@ -60,14 +62,15 @@ header b{font-weight:900;font-size:15px;margin-right:auto}
 #pack{position:absolute;inset:-4% -4%;display:block;transform-style:preserve-3d;transition:transform .12s ease-out;--mx:35%;--my:25%;filter:drop-shadow(0 20px 18px #0005)}
 #pack.press{scale:.975}
 .body{position:absolute;left:0;right:0;top:7.5%;bottom:5%;overflow:hidden;
-  background:
-    radial-gradient(circle at var(--mx) var(--my),#fffb 0,#fff0 38%),
-    linear-gradient(102deg,transparent 15%,#ffffffd0 28%,transparent 38%,#0000001c 50%,transparent 60%,#ffffffa0 70%,transparent 80%),
-    linear-gradient(165deg,#f6f8f9,#c3cbd0 28%,#f1f4f5 46%,#a7b1b7 68%,#dde3e6 88%,#b9c2c7);
-  background-size:100% 100%,220% 100%,100% 100%;background-position:0 0,var(--mx) 0,0 0;
-  box-shadow:inset 14px 0 20px -10px #0006,inset -14px 0 20px -10px #0006,inset 0 0 0 1px #fff8}
-.body::before{content:"";position:absolute;inset:0;mix-blend-mode:soft-light;opacity:.9;background-size:cover;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='340'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.018 .034' numOctaves='3' seed='7'/%3E%3CfeDiffuseLighting lighting-color='%23a8a8a8' surfaceScale='4'%3E%3CfeDistantLight azimuth='40' elevation='52'/%3E%3C/feDiffuseLighting%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E")}
+  /* 包材：跟卡圖一樣的印刷風格（紫色底、網點、顆粒），表面是亮面塑膠，反光跟著手指移動 */
+  background-image:
+    radial-gradient(circle at var(--mx) var(--my),#fff9 0,#fff0 36%),
+    linear-gradient(102deg,transparent 16%,#ffffff80 27%,transparent 36%,transparent 60%,#ffffff55 69%,transparent 78%),
+    radial-gradient(#ffffff2e 1.3px,transparent 1.9px),
+    radial-gradient(120% 80% at 50% 30%,#a985ea,#8c63d8 55%,#7448c4);
+  background-size:100% 100%,220% 100%,9px 9px,100% 100%;background-position:0 0,var(--mx) 0,0 0,0 0;
+  box-shadow:inset 12px 0 18px -10px #2a105a80,inset -12px 0 18px -10px #2a105a80,inset 0 0 0 1px #fff6}
+.body::before{content:"";position:absolute;inset:0;mix-blend-mode:multiply;opacity:1;background:var(--grain),var(--grain);background-size:160px 160px,230px 230px}
 .body::after{content:"";position:absolute;inset:0;background:radial-gradient(60% 45% at 50% 50%,#fff3,transparent 70%)}
 .foil{background:linear-gradient(105deg,#7a4b00 0%,#d9a21f 16%,#fff3b8 30%,#c48a12 44%,#8a5600 58%,#f2c84b 72%,#fff3b8 86%,#a36c05 100%);background-size:250% 100%;background-position:var(--mx) 0}
 .emboss{position:absolute;inset:7% 0 0 0;filter:drop-shadow(0 1px 0 #ffffffd0) drop-shadow(0 -.6px 0 #5a380066)}
@@ -87,11 +90,11 @@ header b{font-weight:900;font-size:15px;margin-right:auto}
 @keyframes nudge{50%{transform:translateX(12px)}}
 #packwrap.torn .tearhint{opacity:0}
 .seal{position:absolute;left:0;right:0;height:8%;
-  background:linear-gradient(#fff8,#0000 40%,#0003),repeating-linear-gradient(90deg,#e6ebee 0 2px,#98a3a8 2px 4px)}
+  background:linear-gradient(#fff6,#0000 40%,#0003),var(--grain),repeating-linear-gradient(90deg,#c2a6f2 0 2px,#6c45b8 2px 4px)}
 .seal.bottom{bottom:0}
 #strip{position:absolute;left:0;right:0;top:0;height:15%;z-index:2}
 #strip>div{position:absolute;inset:0}
-#strip .seal{top:0;height:100%;background:linear-gradient(#fff8,#0000 40%,#0003) top/100% 53% no-repeat,repeating-linear-gradient(90deg,#e6ebee 0 2px,#98a3a8 2px 4px) top/100% 53% no-repeat,linear-gradient(165deg,#f6f8f9,#d3dadd)}
+#strip .seal{top:0;height:100%;background:linear-gradient(#fff8,#0000 40%,#0003) top/100% 53% no-repeat,repeating-linear-gradient(90deg,#c2a6f2 0 2px,#6c45b8 2px 4px) top/100% 53% no-repeat,var(--grain),linear-gradient(165deg,#a985ea,#8c63d8)}
 #peel{transition:none}
 #peel.fly{transition:transform .45s ease-in,opacity .45s;opacity:0}
 
@@ -337,7 +340,7 @@ function setTear(p){S.p=p;fixed.style.clipPath=`inset(-10px 0 -10px ${p*100}%)`;
 function tween(to){const from=S.p,t0=performance.now(),d=to?200:160;(function f(now){const k=clamp((now-t0)/d,0,1);const p=from+(to-from)*k;if(to&&p-S.grain>.08){S.grain=p;snd.grain()}setTear(p);if(k<1)requestAnimationFrame(f);else if(to)completeTear()})(t0)}
 function completeTear(){if(S.mode!=='sealed')return;S.mode='opening';S.down=false;packwrap.classList.add('torn');if(!S.force){C.packs++;saveC()}snd.rip();buzz(30);
   peel.classList.add('fly');peel.style.transform=`translate(-30%,-500%) rotate(-75deg)`;
-  burst(16,['#e6ebee','#98a3a8','#ffffff'],.2,.6,true);pack.style.transform='';
+  burst(16,['#a985ea','#6c45b8','#c2a6f2','#ffffff'],.2,.6,true);pack.style.transform='';
   setTimeout(()=>{stack.className='center peek';snd.slide()},170);
   setTimeout(()=>{packwrap.classList.add('gone');stack.className='center'},640);
   setTimeout(()=>{S.mode='cards';onTop()},980)}
