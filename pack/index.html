@@ -72,8 +72,9 @@ header b{font-weight:900;font-size:15px;margin-right:auto}
   box-shadow:inset 12px 0 18px -10px #2a105a80,inset -12px 0 18px -10px #2a105a80,inset 0 0 0 1px #fff6}
 .body::before{content:"";position:absolute;inset:0;mix-blend-mode:multiply;opacity:1;background:var(--grain),var(--grain);background-size:160px 160px,230px 230px}
 .body::after{content:"";position:absolute;inset:0;background:radial-gradient(60% 45% at 50% 50%,#fff3,transparent 70%)}
-.foil{background:linear-gradient(105deg,#7a4b00 0%,#d9a21f 16%,#fff3b8 30%,#c48a12 44%,#8a5600 58%,#f2c84b 72%,#fff3b8 86%,#a36c05 100%);background-size:250% 100%;background-position:var(--mx) 0}
-.emboss{position:absolute;inset:7% 0 0 0;filter:drop-shadow(0 1px 0 #ffffffd0) drop-shadow(0 -.6px 0 #5a380066)}
+/* 燙銀：紫色包材上用銀色金屬漸層，跟著手指移動 */
+.foil{background:linear-gradient(105deg,#6e7480 0%,#c9cfd8 15%,#ffffff 28%,#aab2bd 42%,#5f6672 56%,#dfe4ea 70%,#ffffff 84%,#8b929d 100%);background-size:250% 100%;background-position:var(--mx) 0}
+.emboss{position:absolute;inset:7% 0 0 0;filter:drop-shadow(0 1.2px 0 #2a105acc) drop-shadow(0 -.6px 0 #ffffff70)}
 .emblem{position:absolute;inset:0;-webkit-mask:var(--em) center/100% 100% no-repeat;mask:var(--em) center/100% 100% no-repeat}
 /* 卡包正面的插畫小窗：放在燙金圓環裡，反光一樣會掃過 */
 .win{position:absolute;left:30.5%;width:39%;top:20.3%;height:32%;border-radius:50%;overflow:hidden;box-shadow:inset 0 0 0 2px #fff9,0 1px 3px #0004}
@@ -81,12 +82,12 @@ header b{font-weight:900;font-size:15px;margin-right:auto}
 .win::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at var(--mx) var(--my),#fffa 0,#fff0 45%),linear-gradient(102deg,transparent 30%,#fff6 45%,transparent 60%);background-size:100% 100%,260% 100%;background-position:0 0,var(--mx) 0;mix-blend-mode:screen}
 .dots{display:flex;gap:calc(var(--cw) * .025);margin-top:calc(var(--cw) * .01)}
 .dots i{width:calc(var(--cw) * .045);aspect-ratio:1;border-radius:50%;box-shadow:inset 0 0 0 1px #0002}
-.print{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:calc(var(--cw) * .02);padding-bottom:calc(var(--cw) * .15);text-align:center;filter:drop-shadow(0 1px 0 #ffffffd0)}
+.print{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:calc(var(--cw) * .02);padding-bottom:calc(var(--cw) * .15);text-align:center;filter:drop-shadow(0 1.2px 0 #2a105acc) drop-shadow(0 -.6px 0 #ffffff70)}
 .print span{-webkit-background-clip:text;background-clip:text;color:transparent}
 .print .t1{font-weight:900;font-size:calc(var(--cw) * .13);letter-spacing:.1em;line-height:1.2}
 .print .t3{font-size:calc(var(--cw) * .052);font-weight:700;letter-spacing:.22em}
 .print .t4{font-family:var(--display);font-size:calc(var(--cw) * .058);letter-spacing:.08em}
-.tearhint{position:absolute;left:0;right:0;top:-17%;text-align:center;font-size:13px;font-weight:700;color:var(--gold);pointer-events:none;animation:nudge 1.1s ease-in-out infinite;transition:opacity .2s}
+.tearhint{position:absolute;left:0;right:0;top:-17%;text-align:center;font-size:13px;font-weight:700;color:#6c45b8;pointer-events:none;animation:nudge 1.1s ease-in-out infinite;transition:opacity .2s}
 @keyframes nudge{50%{transform:translateX(12px)}}
 #packwrap.torn .tearhint{opacity:0}
 .seal{position:absolute;left:0;right:0;height:8%;
