@@ -166,7 +166,7 @@ header b{font-weight:900;font-size:15px;margin-right:auto}
 #summary .card{position:relative;inset:auto;width:var(--cw);aspect-ratio:5/7;animation:sumin .45s cubic-bezier(.2,1.5,.4,1) backwards}
 @keyframes sumin{from{transform:translateY(30px) scale(.5);opacity:0}}
 .sumnew{position:absolute;top:-7px;right:-7px;background:#e5383b;color:#fff;font-family:var(--display);font-size:10px;padding:1px 6px;border-radius:999px;z-index:2;transform:rotate(8deg)}
-#again.wait{visibility:hidden}
+#again:disabled{opacity:.4;pointer-events:none;box-shadow:0 1px 0 var(--ink);transform:translateY(3px)}
 footer{display:grid;grid-template-columns:1fr 1.4fr;gap:8px}
 .btn.ghost{background:#fff var(--grain);color:var(--ink)}
 #newtag{position:absolute;z-index:3;left:calc(50% + var(--cw) * .5 - 34px);top:calc(50% - var(--cw) * .7 - 12px);background:#e5383b;color:#fff;font-family:var(--display);font-size:13px;padding:2px 8px;border-radius:999px;transform:rotate(8deg) scale(0);pointer-events:none}
@@ -229,7 +229,7 @@ footer{display:grid;grid-template-columns:1fr 1.4fr;gap:8px}
   </div>
   <p id="hint"></p>
   <div id="tray"></div>
-  <footer><button class="btn ghost" id="openbook">收藏冊</button><button class="btn wait" id="again">換一包新的</button></footer>
+  <footer><button class="btn ghost" id="openbook">收藏冊</button><button class="btn" id="again">換一包新的</button></footer>
   <div id="book" hidden><div class="bookhead"><b>收藏冊</b><span id="bookstat"></span><button class="chip" id="closebook">關閉</button></div>
     <p class="lab">點已收集的卡片可以放大來看。</p>
     <div id="bookgrid"></div>
@@ -335,7 +335,7 @@ function newPack(){S.mode='sealed';S.p=0;S.dirSet=false;S.down=false;S.i=0;S.dx=
   stack.className='center in-pack';stack.innerHTML=S.cards.map(cardHTML).reverse().join('');
   packwrap.style.transition='none';packwrap.classList.remove('gone','drop','torn');void packwrap.offsetWidth;packwrap.style.transition='';packwrap.classList.add('drop');
   peel.classList.remove('fly');peel.style.opacity='';strip.style.transform='';tearLine();setTear(0);
-  $('tray').innerHTML='';setFx('');parts=[];$('newtag').classList.remove('go');$('summary').classList.remove('show');$('again').classList.add('wait');
+  $('tray').innerHTML='';setFx('');parts=[];$('newtag').classList.remove('go');$('summary').classList.remove('show');$('again').disabled=false;
   hint('在卡包上往任何方向一拉就撕開，點一下也可以。')}
 function setTear(p){S.p=p;fixed.style.clipPath=`inset(-10px 0 -10px ${p*100}%)`;
   peel.style.clipPath=`inset(-60px ${100-p*100}% -20px -20px)`;peel.style.transformOrigin=`${p*100}% 100%`;
@@ -345,7 +345,7 @@ function setTear(p){S.p=p;fixed.style.clipPath=`inset(-10px 0 -10px ${p*100}%)`;
     for(let i=0;i<=N&&i/N<=p;i++)pts.push(`${X(i/N)} ${Y(c[i])}`);const j=Math.min(N,Math.floor(p*N)),k=Math.min(N,j+1),cv=c[j]+(c[k]-c[j])*(p*N-j);
     pts.push(`${X(p)} ${Y(cv)}`,`${X(p)} 0`,`${X(1)} 0`,`${X(1)} 100%`,`${X(0)} 100%`);$('body').style.clipPath=`polygon(${pts.join(',')})`}else $('body').style.clipPath='none'}
 function tween(to){const from=S.p,t0=performance.now(),d=to?200:160;(function f(now){const k=clamp((now-t0)/d,0,1);const p=from+(to-from)*k;if(to&&p-S.grain>.08){S.grain=p;snd.grain()}setTear(p);if(k<1)requestAnimationFrame(f);else if(to)completeTear()})(t0)}
-function completeTear(){if(S.mode!=='sealed')return;S.mode='opening';S.down=false;packwrap.classList.add('torn');if(!S.force){C.packs++;saveC()}snd.rip();buzz(30);
+function completeTear(){if(S.mode!=='sealed')return;S.mode='opening';S.down=false;$('again').disabled=true;packwrap.classList.add('torn');if(!S.force){C.packs++;saveC()}snd.rip();buzz(30);
   peel.classList.add('fly');peel.style.transform=`translate(-30%,-500%) rotate(-75deg)`;
   burst(16,['#a985ea','#6c45b8','#c2a6f2','#ffffff'],.2,.6,true);pack.style.transform='';
   setTimeout(()=>{stack.className='center peek';snd.slide()},120);
@@ -371,7 +371,7 @@ function fling(dir){const el=topEl();if(!el)return;const c=S.cards[S.i];el.class
 
 function showSummary(){S.mode='summary';stack.innerHTML='';$('tray').innerHTML='';const best=S.cards.reduce((m,c)=>RANK[c.rar]>RANK[m]?c.rar:m,'R'),nn=S.cards.filter(c=>c.isNew).length;
   $('summary').innerHTML='<h2>這一包的 5 張卡</h2>'+S.cards.map((c,k)=>cardHTML(c,k).replace('<div class="card ','<div class="card top ').replace('style="',`style="animation-delay:${k*90}ms;`).replace(/<\/div>$/,(c.isNew?'<span class="sumnew">NEW</span>':'')+'</div>')).join('');
-  $('summary').classList.add('show');$('again').classList.remove('wait');[523,659,784].forEach((f,i)=>tone(f,.18,'triangle',.09,i*.08));
+  $('summary').classList.add('show');$('again').disabled=false;[523,659,784].forEach((f,i)=>tone(f,.18,'triangle',.09,i*.08));
   hint(`最高稀有度 ${RL[best]}`+(nn?`，新卡 ${nn} 張。`:'。'))}
 // ---------- 指標操作 ----------
 stage.addEventListener('pointerdown',e=>{ac();
