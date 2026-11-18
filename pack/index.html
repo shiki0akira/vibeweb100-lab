@@ -184,7 +184,11 @@ footer{display:grid;grid-template-columns:1fr 1.4fr;gap:8px}
 .slot.SR{border-color:#63b8ff}.slot.SSR{border-color:#e0a520}.slot.H{border-color:#e07bd0;box-shadow:0 0 8px #d58bff88}
 .slot span{position:absolute;left:3px;right:3px;bottom:3px;background:#fffdf5e8;border-radius:999px;font-size:9.5px;font-weight:900;text-align:center;line-height:1.5;white-space:nowrap;overflow:hidden}
 .slot i{position:absolute;top:2px;right:2px;font-style:normal;font-family:var(--display);font-size:10px;background:#fffdf5e8;border-radius:999px;padding:0 4px;color:var(--ink)}
-.slot.no{border-color:var(--line);background:#f4f5f7 var(--grain);display:grid;place-items:center;color:#c2c7ce;font-family:var(--display);font-size:13px;cursor:default}
+.slot.no{border-color:var(--line);background:#f4f5f7 var(--grain);cursor:default}
+/* 還沒收集的格子：灰色貓咪頭像剪影 */
+.slot.no::before{content:"";position:absolute;left:50%;top:50%;width:52%;aspect-ratio:1;transform:translate(-50%,-55%);background:#d3d7dd;
+  -webkit-mask:var(--cathead) center/contain no-repeat;mask:var(--cathead) center/contain no-repeat}
+:root{--cathead:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill-rule='evenodd' d='M14 54 18 12 42 30Q50 28 58 30L82 12 86 54Q88 88 50 90Q12 88 14 54ZM33 55a5 6 0 1 0 10 0a5 6 0 1 0-10 0ZM57 55a5 6 0 1 0 10 0a5 6 0 1 0-10 0ZM45 66h10l-5 5z'/%3E%3C/svg%3E")}
 /* 放大看卡 */
 #zoom{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:#0b1220d9;touch-action:none;--cw:min(76vw,330px,calc((100vh - 120px) / 1.4))}
 #zoom[hidden]{display:none}
@@ -305,7 +309,7 @@ function bookBtn(){$('openbook').textContent=`收藏冊 ${Object.keys(C.cards).l
 function renderBook(){const n=Object.keys(C.cards).length;$('bookstat').textContent=`${n} / 40 種・已拆 ${C.packs} 包`;
   $('bookgrid').innerHTML=['H','SSR','SR','R'].map(r=>{const ids=POOL[r],have=ids.filter(i=>C.cards[i]).length;
     return `<div class="sec"><h3><em class="${r}">${RL[r]}</em>${have} / ${ids.length}</h3><div class="slots">${ids.map(i=>{const q=C.cards[i];
-      return q?`<button class="slot ${r} sp" data-z="${i}" style="${spr(i)}" aria-label="放大看 ${CATS[i][0]}"><span>${CATS[i][0]}</span><i>×${q}</i></button>`:`<div class="slot no">？</div>`}).join('')}</div></div>`}).join('')}
+      return q?`<button class="slot ${r} sp" data-z="${i}" style="${spr(i)}" aria-label="放大看 ${CATS[i][0]}"><span>${CATS[i][0]}</span><i>×${q}</i></button>`:`<div class="slot no" aria-label="還沒收集"></div>`}).join('')}</div></div>`}).join('')}
 function genPack(force){let slot=force;if(!slot){const r=Math.random();slot=r<.7?'SR':r<.94?'SSR':'H'}
   const rars=['R','R',Math.random()<.25?'SR':'R','R',slot],used=new Set();
   return rars.map(r=>{const left=POOL[r].filter(i=>!used.has(i)),c=left[rnd(left.length)];used.add(c);return {char:c,rar:r}})}
