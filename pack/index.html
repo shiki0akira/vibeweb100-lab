@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>貓咪大集合拆卡</title>
+<script src="../lab.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
 <style>
@@ -241,6 +242,8 @@ footer{display:grid;grid-template-columns:1fr 1.4fr;gap:8px}
   <div id="zoom" hidden><div id="zcard"></div><p class="zcap" data-t="zcap">拖動卡片看反光，點背景關閉</p><button class="btn ghost" id="zclose" data-t="close">關閉</button></div>
 </div>
 <script>
+// 流量統計：共用的 lab.js 提供 lab.track，沒載入時（例如離線）就什麼都不做。測試包不記錄。
+const track=(n,p)=>{try{window.lab&&lab.track(n,p)}catch(e){}};
 const $=id=>document.getElementById(id);
 const stage=$('stage'),pack=$('pack'),packwrap=$('packwrap'),stack=$('stack'),peel=$('peel'),fixed=$('fixed'),strip=$('strip');
 // 40 隻貓：[名字, 稀有度]，順序跟卡圖一樣（黃、綠、藍、紫各 10 張，由左到右）。
@@ -379,7 +382,7 @@ function setTear(p){S.p=p;fixed.style.clipPath=`inset(-10px 0 -10px ${p*100}%)`;
     for(let i=0;i<=N&&i/N<=p;i++)pts.push(`${X(i/N)} ${Y(c[i])}`);const j=Math.min(N,Math.floor(p*N)),k=Math.min(N,j+1),cv=c[j]+(c[k]-c[j])*(p*N-j);
     pts.push(`${X(p)} ${Y(cv)}`,`${X(p)} 0`,`${X(1)} 0`,`${X(1)} 100%`,`${X(0)} 100%`);$('body').style.clipPath=`polygon(${pts.join(',')})`}else $('body').style.clipPath='none'}
 function tween(to){const from=S.p,t0=performance.now(),d=to?200:160;(function f(now){const k=clamp((now-t0)/d,0,1);const p=from+(to-from)*k;if(to&&p-S.grain>.08){S.grain=p;snd.grain()}setTear(p);if(k<1)requestAnimationFrame(f);else if(to)completeTear()})(t0)}
-function completeTear(){if(S.mode!=='sealed')return;S.mode='opening';S.down=false;$('again').disabled=true;packwrap.classList.add('torn');if(!S.force){C.packs++;saveC()}snd.rip();buzz(30);
+function completeTear(){if(S.mode!=='sealed')return;S.mode='opening';S.down=false;$('again').disabled=true;packwrap.classList.add('torn');if(!S.force){C.packs++;saveC();track('pack_open',{pack_no:C.packs})}snd.rip();buzz(30);
   peel.classList.add('fly');peel.style.transform=`translate(-30%,-500%) rotate(-75deg)`;
   burst(16,['#a985ea','#6c45b8','#c2a6f2','#ffffff'],.2,.6,true);pack.style.transform='';
   setTimeout(()=>{stack.className='center peek';snd.slide()},120);
@@ -405,7 +408,7 @@ function fling(dir){const el=topEl();if(!el)return;const c=S.cards[S.i];el.class
 
 function showSummary(){S.mode='summary';stack.innerHTML='';$('tray').innerHTML='';const best=S.cards.reduce((m,c)=>RANK[c.rar]>RANK[m]?c.rar:m,'R'),nn=S.cards.filter(c=>c.isNew).length;
   $('summary').innerHTML='<h2 data-t="sumTitle">'+t('sumTitle')+'</h2>'+S.cards.map((c,k)=>cardHTML(c,k).replace('<div class="card ','<div class="card top ').replace('style="',`style="animation-delay:${k*90}ms;`).replace(/<\/div>$/,(c.isNew?'<span class="sumnew">NEW</span>':'')+'</div>')).join('');
-  $('summary').classList.add('show');$('again').disabled=false;[523,659,784].forEach((f,i)=>tone(f,.18,'triangle',.09,i*.08));
+  $('summary').classList.add('show');$('again').disabled=false;if(!S.force){const got=Object.keys(C.cards).length;track('pack_done',{best:best,new_cards:nn,collected:got,pack_no:C.packs});if(best==='H')track('hidden_pull',{cat:CATS[S.cards.find(c=>c.rar==='H').char][0]});if(got===40&&nn)track('collection_complete',{pack_no:C.packs})}[523,659,784].forEach((f,i)=>tone(f,.18,'triangle',.09,i*.08));
   hint(()=>t('best')(RL[best],nn))}
 // ---------- 指標操作 ----------
 stage.addEventListener('pointerdown',e=>{ac();
@@ -456,14 +459,14 @@ $('lang').addEventListener('click',()=>{LANG=LANG==='en'?'zh':'en';try{localStor
   const z=$('zcard').firstChild;if(z){const i=+$('zcard').dataset.i;z.querySelector('.plate b').textContent=nm(i);z.querySelector('.rar').textContent=RL[CATS[i][1]]}});
 $('snd').addEventListener('click',()=>{S.sound=!S.sound;$('snd').classList.toggle('on',S.sound)});
 $('again').addEventListener('click',newPack);
-$('openbook').addEventListener('click',()=>{renderBook();$('book').hidden=false});
+$('openbook').addEventListener('click',()=>{renderBook();$('book').hidden=false;track('book_open',{collected:Object.keys(C.cards).length})});
 $('closebook').addEventListener('click',()=>{$('book').hidden=true});
 // 測試選項只給自己用：網址後面加 ?test 才會出現
 if(new URLSearchParams(location.search).has('test'))$('toggledebug').hidden=false;
 $('toggledebug').addEventListener('click',()=>{const d=$('debug');d.hidden=!d.hidden;$('toggledebug').textContent=t(d.hidden?'showDebug':'hideDebug');if(d.hidden&&S.force){S.force='';document.querySelectorAll('[data-force]').forEach(x=>x.classList.toggle('on',x.dataset.force===''));newPack()}});
 // ---------- 收藏冊放大看卡 ----------
 const Z={on:false,down:false,hover:false,x:.5,y:.5},zoom=$('zoom');
-function openZoom(i){const r=CATS[i][1];$('zcard').dataset.i=i;$('zcard').innerHTML=cardHTML({char:i,rar:r},0).replace('class="card ','class="card top ');Z.on=true;Z.down=Z.hover=false;zoom.hidden=false;
+function openZoom(i){const r=CATS[i][1];track('card_zoom',{cat:CATS[i][0],rarity:r});$('zcard').dataset.i=i;$('zcard').innerHTML=cardHTML({char:i,rar:r},0).replace('class="card ','class="card top ');Z.on=true;Z.down=Z.hover=false;zoom.hidden=false;
   snd.chime(r==='H'?'SR':r)}
 function closeZoom(){Z.on=false;zoom.hidden=true;$('zcard').innerHTML=''}
 $('bookgrid').addEventListener('click',e=>{const s=e.target.closest('[data-z]');if(s){ac();openZoom(+s.dataset.z)}});
