@@ -279,6 +279,11 @@ $('sealb').style.clipPath=zig(46,false,4);
 let AC=null,NB=null;
 function ac(){if(!S.sound)return null;try{if(!AC){AC=new (window.AudioContext||window.webkitAudioContext)();NB=AC.createBuffer(1,AC.sampleRate,AC.sampleRate);const d=NB.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1}
   if(AC.state==='suspended')AC.resume();return AC}catch(e){return null}}
+// 手機瀏覽器（特別是 iPhone）只在「手指放開」或「點擊」時才准許開聲音，按下去的那一刻不算。
+// 所以在每次放開手指時檢查：還沒開的話就恢復音效並播一段無聲的聲音，開成功後就不再檢查。
+function unlockAudio(){const a=ac();if(!a)return;try{if(a.state!=='running')a.resume();const b=a.createBuffer(1,1,22050),s=a.createBufferSource();s.buffer=b;s.connect(a.destination);s.start(0)}catch(e){}
+  if(a.state==='running')['touchend','pointerup','click','keydown'].forEach(t=>removeEventListener(t,unlockAudio,true))}
+['touchend','pointerup','click','keydown'].forEach(t=>addEventListener(t,unlockAudio,true));
 function noise(dur,freq,q,vol,delay){const a=ac();if(!a)return;const t=a.currentTime+(delay||0),s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();s.buffer=NB;s.loop=true;f.type='bandpass';f.frequency.value=freq;f.Q.value=q;
   g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);s.connect(f).connect(g).connect(a.destination);s.start(t,Math.random()*.5);s.stop(t+dur)}
 function tone(fr,dur,type,vol,delay){const a=ac();if(!a)return;const t=a.currentTime+(delay||0),o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(fr,t);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g).connect(a.destination);o.start(t);o.stop(t+dur)}
