@@ -229,8 +229,7 @@ footer{display:grid;grid-template-columns:1fr 1.4fr;gap:8px}
   <div id="book" hidden><div class="bookhead"><b>收藏冊</b><span id="bookstat"></span><button class="chip" id="closebook">關閉</button></div>
     <p class="lab">點已收集的卡片可以放大來看。</p>
     <div id="bookgrid"></div>
-    <p class="lab">收藏只存在這台裝置的這個瀏覽器裡。</p>
-    <button class="chip" id="toggledebug">顯示測試選項</button></div>
+    <button class="chip" id="toggledebug" hidden>顯示測試選項</button></div>
   <div id="zoom" hidden><div id="zcard"></div><p class="zcap">拖動卡片看反光，點背景關閉</p><button class="btn ghost" id="zclose">關閉</button></div>
 </div>
 <script>
@@ -409,6 +408,8 @@ $('snd').addEventListener('click',()=>{S.sound=!S.sound;$('snd').classList.toggl
 $('again').addEventListener('click',newPack);
 $('openbook').addEventListener('click',()=>{renderBook();$('book').hidden=false});
 $('closebook').addEventListener('click',()=>{$('book').hidden=true});
+// 測試選項只給自己用：網址後面加 ?test 才會出現
+if(new URLSearchParams(location.search).has('test'))$('toggledebug').hidden=false;
 $('toggledebug').addEventListener('click',()=>{const d=$('debug');d.hidden=!d.hidden;$('toggledebug').textContent=d.hidden?'顯示測試選項':'隱藏測試選項';if(d.hidden&&S.force){S.force='';document.querySelectorAll('[data-force]').forEach(x=>x.classList.toggle('on',x.dataset.force===''));newPack()}});
 // ---------- 收藏冊放大看卡 ----------
 const Z={on:false,down:false,hover:false,x:.5,y:.5},zoom=$('zoom');
