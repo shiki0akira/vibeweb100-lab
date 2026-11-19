@@ -159,6 +159,12 @@ html[data-lang="en"] .print .t3{font-size:calc(var(--cw) * .045);letter-spacing:
 
 #hint{text-align:center;color:var(--muted);min-height:1.5em}
 #tray{display:flex;gap:6px;justify-content:center;min-height:50px}
+/* 保底提示：再幾包必出隱藏卡。剩 5 包以內變紫色發光，這包就是保底時變彩虹 */
+#pity{align-self:center;font-size:12px;font-weight:700;color:var(--muted);background:#f3f0f9;border-radius:999px;padding:2px 12px;line-height:1.6;font-variant-numeric:tabular-nums}
+#pity b{font-family:var(--display);font-size:13px;margin:0 1px}
+#pity.hot{color:#6c45b8;background:#efe6ff;box-shadow:0 0 0 2px #c2a6f2,0 0 12px #a985ea99;animation:pityglow 1.2s ease-in-out infinite alternate}
+#pity.now{color:#fff;background:linear-gradient(90deg,#ff5a4d,#f5b942,#3fcf7d,#4a9ff0,#b36be6);box-shadow:0 0 14px #d58bffaa;animation:pityglow .7s ease-in-out infinite alternate}
+@keyframes pityglow{to{filter:brightness(1.18);transform:scale(1.04)}}
 .mini{width:34px;height:48px;border-radius:5px;background-color:var(--paper);border:3px solid #b9c3c6;animation:mini .3s cubic-bezier(.2,1.5,.4,1)}
 .mini.SR{border-color:#63b8ff}.mini.SSR{border-color:#e0a520}.mini.H{border-color:#e07bd0;box-shadow:0 0 10px #d58bff}
 @keyframes mini{from{transform:scale(0)}}
@@ -198,7 +204,15 @@ footer{display:grid;grid-template-columns:1fr 1.4fr;gap:8px}
   -webkit-mask:var(--cathead) center/contain no-repeat;mask:var(--cathead) center/contain no-repeat}
 :root{--cathead:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill-rule='evenodd' d='M14 54 18 12 42 30Q50 28 58 30L82 12 86 54Q88 88 50 90Q12 88 14 54ZM33 55a5 6 0 1 0 10 0a5 6 0 1 0-10 0ZM57 55a5 6 0 1 0 10 0a5 6 0 1 0-10 0ZM45 66h10l-5 5z'/%3E%3C/svg%3E")}
 /* 放大看卡 */
-#zoom{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:#0b1220d9;touch-action:none;--cw:min(76vw,330px,calc((100vh - 120px) / 1.4))}
+#zoom{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#0b1220d9;touch-action:none;--cw:min(60vw,260px,calc((100vh - 200px) / 1.4))}
+/* 放大看卡：左右箭頭換卡 */
+#zrow{display:flex;align-items:center;gap:10px}
+.zarrow{width:44px;height:44px;flex:none;border-radius:50%;border:2.5px solid var(--ink);background:#fff var(--grain);color:var(--ink);font-size:24px;font-weight:900;line-height:1;box-shadow:0 3px 0 var(--ink);display:grid;place-items:center;padding:0 0 3px}
+.zarrow:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+.zarrow:disabled{visibility:hidden}
+#zpos{color:#fff;font-family:var(--display);font-size:13px;opacity:.7;font-variant-numeric:tabular-nums}
+/* 收藏冊裡第一次拿到、還沒點開看過的卡：左上角紅點 */
+.slot .dot{position:absolute;top:4px;left:4px;width:11px;height:11px;border-radius:50%;background:#e5383b;border:2px solid #fff;box-shadow:0 1px 2px #0005;z-index:1}
 #zoom[hidden]{display:none}
 #zoom .card{position:relative;inset:auto;width:var(--cw);aspect-ratio:5/7;animation:sumin .4s cubic-bezier(.2,1.5,.4,1)}
 #zoom .zcap{color:#fff;font-weight:700;font-size:13px;opacity:.8}
@@ -232,6 +246,7 @@ footer{display:grid;grid-template-columns:1fr 1.4fr;gap:8px}
     <div id="stamp"></div><div id="newtag">NEW</div>
     <canvas id="fx"></canvas><div id="flash"></div>
   </div>
+  <p id="pity" aria-live="polite"></p>
   <p id="hint"></p>
   <div id="tray"></div>
   <footer><button class="btn ghost" id="openbook">收藏冊</button><button class="btn" id="again" data-t="again">換一包新的</button></footer>
@@ -239,7 +254,7 @@ footer{display:grid;grid-template-columns:1fr 1.4fr;gap:8px}
     <p class="lab" data-t="bookTip">點已收集的卡片可以放大來看。</p>
     <div id="bookgrid"></div>
     <button class="chip" id="toggledebug" data-t="showDebug" hidden>顯示測試選項</button></div>
-  <div id="zoom" hidden><div id="zcard"></div><p class="zcap" data-t="zcap">拖動卡片看反光，點背景關閉</p><button class="btn ghost" id="zclose" data-t="close">關閉</button></div>
+  <div id="zoom" hidden><div id="zrow"><button class="zarrow" id="zprev">‹</button><div id="zcard"></div><button class="zarrow" id="znext">›</button></div><span id="zpos"></span><p class="zcap" data-t="zcap">拖動卡片看反光，點背景關閉</p><button class="btn ghost" id="zclose" data-t="close">關閉</button></div>
 </div>
 <script>
 // 流量統計：共用的 lab.js 提供 lab.track，沒載入時（例如離線）就什麼都不做。測試包不記錄。
@@ -262,18 +277,18 @@ const NAMES_EN=['Sesame','Cotton','Silver','Snowball','Coal','Peanut','Kumquat',
 const TEXT={
   zh:{title:'貓咪大集合拆卡',sound:'音效',lang:'EN',langAria:'Switch to English',debugLab:'測試包（不計入收藏）',random:'隨機',H:'隱藏',
     tearhint:'往旁邊一拉就撕開 →',packName:'貓咪大集合',packSub:'第 1 彈・40 種・5 張入',book:'收藏冊',again:'換一包新的',close:'關閉',
-    bookTip:'點已收集的卡片可以放大來看。',showDebug:'顯示測試選項',hideDebug:'隱藏測試選項',zcap:'拖動卡片看反光，點背景關閉',
+    bookTip:'點已收集的卡片可以放大來看。',showDebug:'顯示測試選項',hideDebug:'隱藏測試選項',zcap:'拖動看反光，左右滑動換卡，點背景關閉',prev:'上一張',next:'下一張',isNew:'新的',
     bookstat:(n,p)=>`${n} / 40 種・已拆 ${p} 包`,zoomAria:n=>`放大看 ${n}`,notYet:'還沒收集',stampH:'隱藏卡！',
     tapTear:'在卡包上往任何方向一拉就撕開，點一下也可以。',last:'最後一張。滑走後看這一包的全部卡片。',
     glow:'下一張在發光。慢慢把這張滑開。',swipe:'把最上面這張滑走，或點一下。',sumTitle:'這一包的 5 張卡',
-    best:(b,nn)=>`最高稀有度 ${b}`+(nn?`，新卡 ${nn} 張。`:'。'),stageAria:'卡包。按 Enter 撕開或翻下一張'},
+    best:(b,nn)=>`最高稀有度 ${b}`+(nn?`，新卡 ${nn} 張。`:'。'),pity:n=>`再 <b>${n}</b> 包必出隱藏卡`,pityNow:'這包必出隱藏卡！',stageAria:'卡包。按 Enter 撕開或翻下一張'},
   en:{title:'Cat Pack Opening',sound:'Sound',lang:'中文',langAria:'切換成中文',debugLab:'Test pack (not saved)',random:'Random',H:'SECRET',
     tearhint:'Pull to the side to tear →',packName:'CAT PARADE',packSub:'VOL.1 · 40 CATS · 5 CARDS',book:'Collection',again:'New pack',close:'Close',
-    bookTip:'Tap a card you own to see it up close.',showDebug:'Show test options',hideDebug:'Hide test options',zcap:'Drag the card to see it shine. Tap outside to close.',
+    bookTip:'Tap a card you own to see it up close.',showDebug:'Show test options',hideDebug:'Hide test options',zcap:'Drag to see it shine, swipe to switch. Tap outside to close.',prev:'Previous card',next:'Next card',isNew:'new',
     bookstat:(n,p)=>`${n} / 40 cats · ${p} ${p===1?'pack':'packs'} opened`,zoomAria:n=>`View ${n}`,notYet:'Not collected yet',stampH:'SECRET!',
     tapTear:'Pull the pack any way to tear it, or just tap.',last:'Last card. Swipe it away to see the whole pack.',
     glow:'The next card is glowing. Slide this one away slowly.',swipe:'Swipe the top card away, or tap it.',sumTitle:'Your 5 cards',
-    best:(b,nn)=>`Best pull: ${b}`+(nn?` · ${nn} new!`:'.'),stageAria:'Card pack. Press Enter to tear it open or show the next card.'}};
+    best:(b,nn)=>`Best pull: ${b}`+(nn?` · ${nn} new!`:'.'),pity:n=>`SECRET card guaranteed in <b>${n}</b> packs`,pityNow:'This pack has a guaranteed SECRET!',stageAria:'Card pack. Press Enter to tear it open or show the next card.'}};
 // 語言：網址 ?lang=en 或 ?lang=zh 最優先，再來是上次選的，都沒有就看手機的語言設定
 const LKEY='packLang';let LANG=(()=>{const q=new URLSearchParams(location.search).get('lang');if(q==='en'||q==='zh')return q;
   try{const v=localStorage.getItem(LKEY);if(v==='en'||v==='zh')return v}catch(e){}
@@ -282,8 +297,8 @@ const t=k=>TEXT[LANG][k],nm=i=>LANG==='en'?NAMES_EN[i]:CATS[i][0];
 function applyLang(){document.documentElement.lang=LANG==='en'?'en':'zh-Hant';document.documentElement.dataset.lang=LANG;document.title=TEXT.zh.title;// 網頁標題固定中文，GA4 才不會把中英文算成兩個頁面
 
   document.querySelectorAll('[data-t]').forEach(el=>{el.textContent=t(el.dataset.t)});
-  $('lang').textContent=t('lang');$('lang').setAttribute('aria-label',t('langAria'));stage.setAttribute('aria-label',t('stageAria'));
-  if(!$('debug').hidden)$('toggledebug').textContent=t('hideDebug')}
+  $('zprev').setAttribute('aria-label',t('prev'));$('znext').setAttribute('aria-label',t('next'));$('lang').textContent=t('lang');$('lang').setAttribute('aria-label',t('langAria'));stage.setAttribute('aria-label',t('stageAria'));
+  if(!$('debug').hidden)$('toggledebug').textContent=t('hideDebug');if(pityOK)renderPity()}
 // 卡圖在整張圖裡的位置（像素），用來切出每一隻
 const SHEET=[1536,1024],COLX=[[16,167],[172,319],[324,470],[474,620],[624,768],[772,919],[923,1069],[1073,1219],[1223,1370],[1374,1521]],ROWY=[[28,253],[264,491],[504,734],[746,971]];
 function spr(i,fx=0,fy=0,fw=1,fh=1){const [a,b]=COLX[i%10],[c,d]=ROWY[Math.floor(i/10)],k=4;let x=a+k,y=c+k,w=b-a-2*k,h=d-c-2*k;if(h>w*1.4){y+=(h-w*1.4)/2;h=w*1.4}// 卡片是 5:7，太高的部分上下平均裁掉
@@ -347,19 +362,24 @@ function shake(){if(still)return;stage.classList.remove('shake');void stage.offs
 
 // ---------- 卡包內容 ----------
 // 收藏：鍵是貓的編號。換成 40 隻不同的貓後改用新鍵名，舊收藏的格子對不上所以不沿用，只保留已拆包數。
-const CKEY='packFeelCollection2',C={cards:{},packs:0};
-try{const d=JSON.parse(localStorage.getItem(CKEY)||'null');if(d&&d.cards){C.cards=d.cards;C.packs=d.packs||0}
+const CKEY='packFeelCollection2',C={cards:{},packs:0,unseen:{},dry:0};
+try{const d=JSON.parse(localStorage.getItem(CKEY)||'null');if(d&&d.cards){C.cards=d.cards;C.packs=d.packs||0;C.unseen=d.unseen||{};C.dry=d.dry||0}
   else{const o=JSON.parse(localStorage.getItem('packFeelCollection')||'null');if(o)C.packs=o.packs||0}}catch(e){}
 function saveC(){try{localStorage.setItem(CKEY,JSON.stringify(C))}catch(e){}}
-function collect(c){if(S.force||c.got)return false;c.got=true;const k=String(c.char),isNew=!C.cards[k];C.cards[k]=(C.cards[k]||0)+1;saveC();bookBtn();return isNew}
+function collect(c){if(S.force||c.got)return false;c.got=true;const k=String(c.char),isNew=!C.cards[k];C.cards[k]=(C.cards[k]||0)+1;if(isNew)C.unseen[k]=1;saveC();bookBtn();return isNew}
 function bookBtn(){$('openbook').textContent=`${t('book')} ${Object.keys(C.cards).length}/40`}
 function renderBook(){const n=Object.keys(C.cards).length;$('bookstat').textContent=t('bookstat')(n,C.packs);
   $('bookgrid').innerHTML=['H','SSR','SR','R'].map(r=>{const ids=POOL[r],have=ids.filter(i=>C.cards[i]).length;
     return `<div class="sec"><h3><em class="${r}">${RL[r]}</em>${have} / ${ids.length}</h3><div class="slots">${ids.map(i=>{const q=C.cards[i];
-      return q?`<button class="slot ${r} sp" data-z="${i}" style="${spr(i)}" aria-label="${t('zoomAria')(nm(i))}"><span>${nm(i)}</span><i>×${q}</i></button>`:`<div class="slot no" aria-label="${t('notYet')}"></div>`}).join('')}</div></div>`}).join('')}
-function genPack(force){let slot=force;if(!slot){const r=Math.random();slot=r<.7?'SR':r<.94?'SSR':'H'}
+      return q?`<button class="slot ${r} sp" data-z="${i}" style="${spr(i)}" aria-label="${t('zoomAria')(nm(i))}${C.unseen[i]?'（'+t('isNew')+'）':''}">${C.unseen[i]?'<b class="dot"></b>':''}<span>${nm(i)}</span><i>×${q}</i></button>`:`<div class="slot no" aria-label="${t('notYet')}"></div>`}).join('')}</div></div>`}).join('')}
+// 保底：連續 29 包沒開到隱藏卡，第 30 包的最後一張一定是隱藏卡，而且優先給還沒收集到的。
+// C.dry 是「距離上次開到隱藏卡已經拆了幾包」，只算真的撕開的包，測試包不算。自然開到隱藏卡就歸零。
+var pityOK=false;const PITY=30;
+function genPack(force){const pity=!force&&C.dry>=PITY-1;S.pity=pity;let slot=force;if(pity)slot='H';else if(!slot){const r=Math.random();slot=r<.7?'SR':r<.94?'SSR':'H'}
   const rars=['R','R',Math.random()<.25?'SR':'R','R',slot],used=new Set();
-  return rars.map(r=>{const left=POOL[r].filter(i=>!used.has(i)),c=left[rnd(left.length)];used.add(c);return {char:c,rar:r}})}
+  return rars.map(r=>{let left=POOL[r].filter(i=>!used.has(i));if(pity&&r==='H'){const nw=left.filter(i=>!C.cards[i]);if(nw.length)left=nw}const c=left[rnd(left.length)];used.add(c);return {char:c,rar:r}})}
+function renderPity(){const el=$('pity'),n=PITY-C.dry;el.className=n<=1?'now':n<=5?'hot':'';el.innerHTML=n<=1?t('pityNow'):t('pity')(n)}
+pityOK=true;
 function cardHTML(c,k){const n=nm(c.char);return `<div class="card ${c.rar}" data-i="${k}"><div class="in"><div class="art sp" style="${spr(c.char)}"></div>
   <span class="rar">${RL[c.rar]}</span><div class="plate"><b>${n}</b><i>${no(c.char)}</i></div></div>
   <div class="holo"></div><div class="spark"></div><div class="glare"></div></div>`}
@@ -374,7 +394,7 @@ function newPack(){S.mode='sealed';S.p=0;S.dirSet=false;S.down=false;S.i=0;S.dx=
   packwrap.style.transition='none';packwrap.classList.remove('gone','drop','torn');void packwrap.offsetWidth;packwrap.style.transition='';packwrap.classList.add('drop');
   peel.classList.remove('fly');peel.style.opacity='';strip.style.transform='';tearLine();setTear(0);
   $('tray').innerHTML='';setFx('');parts=[];$('newtag').classList.remove('go');$('summary').classList.remove('show');$('again').disabled=false;
-  hint(()=>t('tapTear'))}
+  renderPity();hint(()=>t('tapTear'))}
 function setTear(p){S.p=p;fixed.style.clipPath=`inset(-10px 0 -10px ${p*100}%)`;
   peel.style.clipPath=`inset(-60px ${100-p*100}% -20px -20px)`;peel.style.transformOrigin=`${p*100}% 100%`;
   peel.style.transform=p>0?`rotate(${-(8+p*24)}deg) skewX(${-p*10}deg)`:'none';
@@ -383,7 +403,7 @@ function setTear(p){S.p=p;fixed.style.clipPath=`inset(-10px 0 -10px ${p*100}%)`;
     for(let i=0;i<=N&&i/N<=p;i++)pts.push(`${X(i/N)} ${Y(c[i])}`);const j=Math.min(N,Math.floor(p*N)),k=Math.min(N,j+1),cv=c[j]+(c[k]-c[j])*(p*N-j);
     pts.push(`${X(p)} ${Y(cv)}`,`${X(p)} 0`,`${X(1)} 0`,`${X(1)} 100%`,`${X(0)} 100%`);$('body').style.clipPath=`polygon(${pts.join(',')})`}else $('body').style.clipPath='none'}
 function tween(to){const from=S.p,t0=performance.now(),d=to?200:160;(function f(now){const k=clamp((now-t0)/d,0,1);const p=from+(to-from)*k;if(to&&p-S.grain>.08){S.grain=p;snd.grain()}setTear(p);if(k<1)requestAnimationFrame(f);else if(to)completeTear()})(t0)}
-function completeTear(){if(S.mode!=='sealed')return;S.mode='opening';S.down=false;$('again').disabled=true;packwrap.classList.add('torn');if(!S.force){C.packs++;saveC();track('pack_open',{pack_no:C.packs})}snd.rip();buzz(30);
+function completeTear(){if(S.mode!=='sealed')return;S.mode='opening';S.down=false;$('again').disabled=true;packwrap.classList.add('torn');if(!S.force){C.packs++;C.dry=S.cards.some(c=>c.rar==='H')?0:C.dry+1;saveC();track('pack_open',{pack_no:C.packs,pity:S.pity?1:0})}snd.rip();buzz(30);
   peel.classList.add('fly');peel.style.transform=`translate(-30%,-500%) rotate(-75deg)`;
   burst(16,['#a985ea','#6c45b8','#c2a6f2','#ffffff'],.2,.6,true);pack.style.transform='';
   setTimeout(()=>{stack.className='center peek';snd.slide()},120);
@@ -409,7 +429,7 @@ function fling(dir){const el=topEl();if(!el)return;const c=S.cards[S.i];el.class
 
 function showSummary(){S.mode='summary';stack.innerHTML='';$('tray').innerHTML='';const best=S.cards.reduce((m,c)=>RANK[c.rar]>RANK[m]?c.rar:m,'R'),nn=S.cards.filter(c=>c.isNew).length;
   $('summary').innerHTML='<h2 data-t="sumTitle">'+t('sumTitle')+'</h2>'+S.cards.map((c,k)=>cardHTML(c,k).replace('<div class="card ','<div class="card top ').replace('style="',`style="animation-delay:${k*90}ms;`).replace(/<\/div>$/,(c.isNew?'<span class="sumnew">NEW</span>':'')+'</div>')).join('');
-  $('summary').classList.add('show');$('again').disabled=false;if(!S.force){const got=Object.keys(C.cards).length;track('pack_done',{best:best,new_cards:nn,collected:got,pack_no:C.packs});if(best==='H')track('hidden_pull',{cat:CATS[S.cards.find(c=>c.rar==='H').char][0]});if(got===40&&nn)track('collection_complete',{pack_no:C.packs})}[523,659,784].forEach((f,i)=>tone(f,.18,'triangle',.09,i*.08));
+  $('summary').classList.add('show');$('again').disabled=false;if(!S.force){const got=Object.keys(C.cards).length;track('pack_done',{best:best,new_cards:nn,collected:got,pack_no:C.packs,pity:S.pity?1:0});if(best==='H')track('hidden_pull',{cat:CATS[S.cards.find(c=>c.rar==='H').char][0],pity:S.pity?1:0});if(got===40&&nn)track('collection_complete',{pack_no:C.packs})}[523,659,784].forEach((f,i)=>tone(f,.18,'triangle',.09,i*.08));
   hint(()=>t('best')(RL[best],nn))}
 // ---------- 指標操作 ----------
 stage.addEventListener('pointerdown',e=>{ac();
@@ -467,16 +487,21 @@ if(new URLSearchParams(location.search).has('test'))$('toggledebug').hidden=fals
 $('toggledebug').addEventListener('click',()=>{const d=$('debug');d.hidden=!d.hidden;$('toggledebug').textContent=t(d.hidden?'showDebug':'hideDebug');if(d.hidden&&S.force){S.force='';document.querySelectorAll('[data-force]').forEach(x=>x.classList.toggle('on',x.dataset.force===''));newPack()}});
 // ---------- 收藏冊放大看卡 ----------
 const Z={on:false,down:false,hover:false,x:.5,y:.5},zoom=$('zoom');
-function openZoom(i){const r=CATS[i][1];track('card_zoom',{cat:CATS[i][0],rarity:r});$('zcard').dataset.i=i;$('zcard').innerHTML=cardHTML({char:i,rar:r},0).replace('class="card ','class="card top ');Z.on=true;Z.down=Z.hover=false;zoom.hidden=false;
+// 換卡的順序跟收藏冊一樣（隱藏、SSR、SR、R），只算已收集的
+const zlist=()=>['H','SSR','SR','R'].flatMap(r=>POOL[r].filter(i=>C.cards[i]));
+function zstep(d){if(!Z.on)return;const L=zlist(),k=L.indexOf(+$('zcard').dataset.i)+d;if(k>=0&&k<L.length)openZoom(L[k])}
+function openZoom(i){const r=CATS[i][1];if(C.unseen[i]){delete C.unseen[i];saveC();if(!$('book').hidden)renderBook()}
+  const L=zlist(),k=L.indexOf(i);$('zprev').disabled=k<=0;$('znext').disabled=k<0||k>=L.length-1;$('zpos').textContent=`${k+1} / ${L.length}`;track('card_zoom',{cat:CATS[i][0],rarity:r});$('zcard').dataset.i=i;$('zcard').innerHTML=cardHTML({char:i,rar:r},0).replace('class="card ','class="card top ');Z.on=true;Z.down=Z.hover=false;zoom.hidden=false;
   snd.chime(r==='H'?'SR':r)}
 function closeZoom(){Z.on=false;zoom.hidden=true;$('zcard').innerHTML=''}
 $('bookgrid').addEventListener('click',e=>{const s=e.target.closest('[data-z]');if(s){ac();openZoom(+s.dataset.z)}});
 function zpos(e){const el=$('zcard').firstChild;if(!el)return;const r=el.getBoundingClientRect();Z.x=clamp((e.clientX-r.left)/r.width,0,1);Z.y=clamp((e.clientY-r.top)/r.height,0,1)}
-zoom.addEventListener('pointerdown',e=>{if(e.target.closest('.card')){Z.down=true;zpos(e);try{zoom.setPointerCapture(e.pointerId)}catch(err){}}else if(!e.target.closest('button'))closeZoom()});
+zoom.addEventListener('pointerdown',e=>{if(e.target.closest('.card')){Z.down=true;Z.sx=e.clientX;Z.sy=e.clientY;zpos(e);try{zoom.setPointerCapture(e.pointerId)}catch(err){}}else if(!e.target.closest('button'))closeZoom()});
 zoom.addEventListener('pointermove',e=>{Z.hover=e.pointerType==='mouse'&&!!e.target.closest('.card');if(Z.down||Z.hover)zpos(e)});
-zoom.addEventListener('pointerup',()=>{Z.down=false});zoom.addEventListener('pointercancel',()=>{Z.down=false});
+zoom.addEventListener('pointerup',e=>{if(Z.down){const dx=e.clientX-Z.sx,dy=e.clientY-Z.sy;Z.down=false;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.2)zstep(dx<0?1:-1)}});zoom.addEventListener('pointercancel',()=>{Z.down=false});
 $('zclose').addEventListener('click',closeZoom);
-addEventListener('keydown',e=>{if(e.key==='Escape'&&Z.on)closeZoom()});
+$('zprev').addEventListener('click',()=>zstep(-1));$('znext').addEventListener('click',()=>zstep(1));
+addEventListener('keydown',e=>{if(!Z.on)return;if(e.key==='Escape')closeZoom();else if(e.key==='ArrowLeft')zstep(-1);else if(e.key==='ArrowRight')zstep(1)});
 applyLang();bookBtn();
 addEventListener('resize',size);size();newPack();requestAnimationFrame(loop);
 </script>
